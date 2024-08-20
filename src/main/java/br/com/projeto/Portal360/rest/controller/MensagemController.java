@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.projeto.Portal360.model.entity.Mensagem;
+import br.com.projeto.Portal360.rest.exception.ResourceNotFoundException;
 import br.com.projeto.Portal360.service.MensagemService;
 
 @RestController
@@ -28,6 +29,19 @@ public class MensagemController {
 	public ResponseEntity<List<Mensagem>> FindAll() {
 		List<Mensagem> mensagens = mensagemService.findAll();
 		return new ResponseEntity<List<Mensagem>>(mensagens, HttpStatus.OK);
+	}
+	
+	@GetMapping("findById/{id}")
+	public ResponseEntity<Mensagem> findById(@PathVariable long id) {
+
+		Mensagem mensagem = mensagemService.findById(id);
+
+		if (mensagem != null) {
+			return new ResponseEntity<Mensagem>(mensagem, HttpStatus.OK);
+		} else {
+			throw new ResourceNotFoundException("*** Mensagem não encontrada! *** " + "ID: " + id);
+		}
+
 	}
 	
 	@PostMapping("create")

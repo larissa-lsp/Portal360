@@ -27,6 +27,7 @@ public class MensagemService {
 	@Transactional
 	public Mensagem create(Mensagem mensagem){
 		mensagem.setDataMensagem(LocalDateTime.now());
+		mensagem.setTipo("MENSAGEM");
 		mensagem.setStatusMensagem("ATIVO");
 		
 		return mensagemRepository.save(mensagem);
@@ -58,6 +59,14 @@ public class MensagemService {
 		}
 		return null;
 	}
-	
+
+	public Mensagem findById(long id) {
+		Optional<Mensagem> _mensagem = mensagemRepository.findById(id);
+		if (_mensagem.isPresent()) {
+			Mensagem mensagem = _mensagem.get();
+			return mensagem;
+		}
+		return null;
+	}
 	
 }

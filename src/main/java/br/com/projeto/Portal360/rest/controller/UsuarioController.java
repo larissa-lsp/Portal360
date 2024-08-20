@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.projeto.Portal360.model.entity.Usuario;
+import br.com.projeto.Portal360.rest.exception.ResourceNotFoundException;
 import br.com.projeto.Portal360.service.UsuarioService;
 
 @RestController
@@ -81,14 +82,28 @@ public class UsuarioController {
 		return new ResponseEntity<Usuario>(_usuario, HttpStatus.OK);
 	}
 	
-	@PostMapping("signin/")
-	public ResponseEntity<?> signin(@RequestParam String email, @RequestParam String senha) {
+	/*@PostMapping("signin")
+	public ResponseEntity<?> signin(
+			@RequestParam String email, @RequestParam String senha) {
 		Usuario usuario = usuarioService.signin(email, senha);
 
 		if (usuario != null) {
 			return ResponseEntity.ok().body(usuario);
 		}
 		return ResponseEntity.badRequest().body("Dados incorretos");
+	}
+	*/
+	@PostMapping("signin")
+	public ResponseEntity<?> signin(@RequestBody Usuario usuario) {
+
+		Usuario _usuario = usuarioService
+				.signin(usuario.getEmail(), usuario.getSenha());
+
+		if (_usuario == null) {
+			throw new ResourceNotFoundException("*** Dados Incorretos! *** ");
+		}
+
+		return ResponseEntity.ok(_usuario);
 	}
 
 	@PutMapping("inativar/{id}")
