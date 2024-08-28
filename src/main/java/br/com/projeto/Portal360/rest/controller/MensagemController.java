@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.projeto.Portal360.model.entity.Mensagem;
 import br.com.projeto.Portal360.rest.exception.ResourceNotFoundException;
+import br.com.projeto.Portal360.rest.response.MessageResponse;
 import br.com.projeto.Portal360.service.MensagemService;
 
 @RestController
@@ -22,15 +23,17 @@ public class MensagemController {
 	private MensagemService mensagemService;
 
 	public MensagemController(MensagemService mensagemService) {
+		super();
 		this.mensagemService = mensagemService;
 	}
 
 	@GetMapping("findAll")
-	public ResponseEntity<List<Mensagem>> FindAll() {
+	public ResponseEntity<List<Mensagem>> findAll() {
 		List<Mensagem> mensagens = mensagemService.findAll();
+
 		return new ResponseEntity<List<Mensagem>>(mensagens, HttpStatus.OK);
 	}
-	
+
 	@GetMapping("findById/{id}")
 	public ResponseEntity<Mensagem> findById(@PathVariable long id) {
 
@@ -43,26 +46,31 @@ public class MensagemController {
 		}
 
 	}
-	
+
 	@PostMapping("create")
-	public ResponseEntity<Mensagem> create(@RequestBody Mensagem mensagem){
+	public ResponseEntity<?> create(@RequestBody Mensagem mensagem) {
+
 		Mensagem _mensagem = mensagemService.create(mensagem);
-		
+
+		if (_mensagem == null) {
+			return ResponseEntity.badRequest().body(new MessageResponse("Mensagem já cadastrada!"));
+		}
+		return ResponseEntity.ok().body(new MessageResponse("Mensagem enviada com sucesso!"));
+	}
+
+	@PutMapping("inativar/{id}")
+	public ResponseEntity<Mensagem> inativar(@PathVariable long id) {
+
+		Mensagem _mensagem = mensagemService.inativar(id);
+
 		return new ResponseEntity<Mensagem>(_mensagem, HttpStatus.OK);
 	}
-	
-	@PutMapping("update/{id}")
-	public ResponseEntity<Mensagem> update(@PathVariable long id){
-		Mensagem mensagem = mensagemService.update(id);
-		
-		return new ResponseEntity<Mensagem>(mensagem, HttpStatus.OK);
+
+	@PutMapping("marcarComoLida/{id}")
+	public ResponseEntity<Mensagem> marcarComoLida(@PathVariable long id) {
+
+		Mensagem _mensagem = mensagemService.marcarComoLida(id);
+
+		return new ResponseEntity<Mensagem>(_mensagem, HttpStatus.OK);
 	}
-	
-	@PutMapping("inativar/{id}")
-	public ResponseEntity<Mensagem> inativar(@PathVariable long id){
-		Mensagem mensagem = mensagemService.inativar(id);
-		
-		return new ResponseEntity<Mensagem>(mensagem, HttpStatus.OK);
-	}
-	
 }

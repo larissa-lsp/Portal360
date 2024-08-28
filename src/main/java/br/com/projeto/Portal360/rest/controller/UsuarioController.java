@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.projeto.Portal360.model.entity.Usuario;
 import br.com.projeto.Portal360.rest.exception.ResourceNotFoundException;
+import br.com.projeto.Portal360.rest.response.MessageResponse;
 import br.com.projeto.Portal360.service.UsuarioService;
 
 @RestController
@@ -27,34 +28,9 @@ public class UsuarioController {
 		super();
 		this.usuarioService = usuarioService;
 	}
-	
-/*	ADM
- *	+ logar(): void
-	+ cadastrarNovoColaborador(): Colaborador
-	+ consultarColaborador(Colaborador): Colaborador 
-	+ editarColaborador(Colaborador): Colaborador
-	+ inativarColaborador(Colaborador): void
-	+ aprovarNoticia(Noticia): void
-	+ criarNoticia(): Noticia
-	+ consultarNoticia(): Noticia
-	+ editarNoticia(Noticia): Noticia
-	
-	Coloborador
-	+ logar(): void
-	+ criarNoticia(): Noticia
-	+ consultarNoticia(): Noticia
-	+ editarNoticia(Noticia): Noticia
-	+ inativarNoticia(Noticia): boolean
-	+ enviarMensagem: Mensagem
-	
-	Leitor
-	+ compartilharNoticia(Noticia): void
-	+ visualizarNoticia(): Noticia
-	+ enviarMensagem: Mensagem*/
 
 	@GetMapping("findAll")
 	public ResponseEntity<List<Usuario>> findAll() {
-
 		List<Usuario> usuarios = usuarioService.findAll();
 
 		return new ResponseEntity<List<Usuario>>(usuarios, HttpStatus.OK);
@@ -62,42 +38,57 @@ public class UsuarioController {
 
 	@GetMapping("findById/{id}")
 	public ResponseEntity<Usuario> findById(@PathVariable long id) {
+
 		Usuario usuario = usuarioService.findById(id);
 
-		return new ResponseEntity<Usuario>(usuario, HttpStatus.OK);
+		if (usuario != null) {
+			return new ResponseEntity<Usuario>(usuario, HttpStatus.OK);
+		} else {
+			throw new ResourceNotFoundException("*** Usuário não encontrado! *** " + "ID: " + id);
+		}
+
 	}
 
 	@GetMapping("findByEmail/")
-
 	public ResponseEntity<Usuario> findByEmail(@RequestParam String email) {
+
 		Usuario usuario = usuarioService.findByEmail(email);
 
-		return new ResponseEntity<Usuario>(usuario, HttpStatus.OK);
+		if (usuario != null) {
+			return new ResponseEntity<Usuario>(usuario, HttpStatus.OK);
+		} else {
+			throw new ResourceNotFoundException("*** Usuário não encontrado! *** " + "E-mail: " + email);
+		}
+
 	}
 
 	@PostMapping("create")
-	public ResponseEntity<Usuario> create(@RequestBody Usuario usuario) {
-		Usuario _usuario = usuarioService.create(usuario);
+	public ResponseEntity<?> create(@RequestBody Usuario usuario) {
 
-		return new ResponseEntity<Usuario>(_usuario, HttpStatus.OK);
-	}
-	
-	/*@PostMapping("signin")
-	public ResponseEntity<?> signin(
-			@RequestParam String email, @RequestParam String senha) {
-		Usuario usuario = usuarioService.signin(email, senha);
+		Usuario _usuario = usuarioService.createNew(usuario);
 
-		if (usuario != null) {
-			return ResponseEntity.ok().body(usuario);
+		System.out.println("_usuario " + _usuario);
+
+		if (_usuario == null) {
+			System.out.println("_usuario 2" + _usuario);
+			return ResponseEntity.badRequest().body(new MessageResponse("Usuário já cadastrado!"));
 		}
-		return ResponseEntity.badRequest().body("Dados incorretos");
+		return ResponseEntity.ok().body(new MessageResponse("Usuário cadastrado com sucesso!"));
 	}
-	*/
-	@PostMapping("signin")
+
+	/*
+	 * @PostMapping("signin") public ResponseEntity<?> signin(
+	 * 
+	 * @RequestParam String email, @RequestParam String senha) {
+	 * 
+	 * Usuario usuario = usuarioService.signin(email, senha); if (usuario != null) {
+	 * return ResponseEntity.ok().body(usuario); } return
+	 * ResponseEntity.badRequest().body("Dados incorretos!"); }
+	 */
+	@PostMapping("/signin")
 	public ResponseEntity<?> signin(@RequestBody Usuario usuario) {
 
-		Usuario _usuario = usuarioService
-				.signin(usuario.getEmail(), usuario.getSenha());
+		Usuario _usuario = usuarioService.signin(usuario.getEmail(), usuario.getSenha());
 
 		if (_usuario == null) {
 			throw new ResourceNotFoundException("*** Dados Incorretos! *** ");
@@ -108,22 +99,26 @@ public class UsuarioController {
 
 	@PutMapping("inativar/{id}")
 	public ResponseEntity<Usuario> inativar(@PathVariable long id) {
-		Usuario usuario = usuarioService.inativar(id);
 
-		return new ResponseEntity<Usuario>(usuario, HttpStatus.OK);
+		Usuario _usuario = usuarioService.inativar(id);
+
+		return new ResponseEntity<Usuario>(_usuario, HttpStatus.OK);
 	}
-	
+
 	@PutMapping("reativar/{id}")
 	public ResponseEntity<Usuario> reativar(@PathVariable long id) {
-		Usuario usuario = usuarioService.reativar(id);
 
-		return new ResponseEntity<Usuario>(usuario, HttpStatus.OK);
+		Usuario _usuario = usuarioService.reativar(id);
+
+		return new ResponseEntity<Usuario>(_usuario, HttpStatus.OK);
 	}
 
 	@PutMapping("alterarSenha/{id}")
-	public ResponseEntity<Usuario> alterarSenha(@PathVariable long id, @RequestBody Usuario usuario) {
+	public ResponseEntity<?> alterarSenha(@PathVariable long id, @RequestBody Usuario usuario) {
+
 		Usuario _usuario = usuarioService.alterarSenha(id, usuario);
 
-		return new ResponseEntity<Usuario>(_usuario, HttpStatus.OK);
+		// return new ResponseEntity<Usuario>(_usuario, HttpStatus.OK);
+		return ResponseEntity.ok().body(new MessageResponse("Senha alterada com sucesso!"));
 	}
 }
