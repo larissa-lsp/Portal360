@@ -22,6 +22,7 @@ public class Noticia {
 	private String palavrasChave;
 	private LocalDate dataEnvio;
 	private LocalDate dataPublicacao;
+	private byte[] foto;
 	private String fonte;
 	
 	@ManyToOne
@@ -79,6 +80,14 @@ public class Noticia {
 		this.dataPublicacao = dataPublicacao;
 	}
 
+	public byte[] getFoto() {
+		return foto;
+	}
+
+	public void setFoto(byte[] foto) {
+		this.foto = foto;
+	}
+	
 	public String getFonte() {
 		return fonte;
 	}
