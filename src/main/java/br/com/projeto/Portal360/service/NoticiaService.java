@@ -1,21 +1,30 @@
 package br.com.projeto.Portal360.service;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import br.com.projeto.Portal360.model.entity.Noticia;
+import br.com.projeto.Portal360.model.entity.Usuario;
 import br.com.projeto.Portal360.model.repository.NoticiaRepository;
+import br.com.projeto.Portal360.model.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
 
 @Service
 public class NoticiaService {
 
 	private NoticiaRepository noticiaRepository;
+	
+	private UsuarioRepository usuarioRepository;
 
-	public NoticiaService(NoticiaRepository noticiaRepository) {
+	public NoticiaService(NoticiaRepository noticiaRepository, UsuarioRepository usuarioRepository) {
+		super();
 		this.noticiaRepository = noticiaRepository;
+		this.usuarioRepository = usuarioRepository;
 	}
 
 	public List<Noticia> findAll() {
@@ -33,6 +42,8 @@ public class NoticiaService {
 	@Transactional
 	public Noticia create(Noticia noticia) {
 
+		noticia.setDataEnvio(LocalDateTime.now());
+		noticia.setDataPublicacao(null);
 		noticia.setStatusNoticia("ATIVO");
 
 		return noticiaRepository.save(noticia);
@@ -67,6 +78,28 @@ public class NoticiaService {
 			return noticiaRepository.save(noticiaAtualizada);
 		}
 		return null;
+	}
+
+	@Transactional
+	public Noticia createComFoto(MultipartFile file, Noticia noticia, long id) {
+		
+		Usuario usuario = usuarioRepository.findById(id).orElseThrow();
+		
+		if (file != null && file.getSize() > 0) {
+			try {
+				noticia.setFoto(file.getBytes());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			noticia.setFoto(null);
+		}
+		noticia.setUsuario(usuario);
+		noticia.setDataEnvio(LocalDateTime.now());
+		noticia.setDataPublicacao(null);
+		noticia.setStatusNoticia("ATIVO");
+
+		return noticiaRepository.save(noticia);
 	}
 
 }
