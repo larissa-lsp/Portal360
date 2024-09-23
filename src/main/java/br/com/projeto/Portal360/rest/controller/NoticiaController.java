@@ -54,12 +54,12 @@ public class NoticiaController {
 		return new ResponseEntity<Noticia>(_noticia, HttpStatus.OK);
 	}
 	
-	@PostMapping("createComFoto/{id}")
+	@PostMapping("createComFoto/{email}")
 	public ResponseEntity<?> createComFoto(
 			@RequestParam(value = "file", required = false) MultipartFile file,
-			@ModelAttribute("noticia") Noticia noticia, @PathVariable long id ) {
+			@ModelAttribute("noticia") Noticia noticia, @PathVariable String email ) {
 
-		noticiaService.createComFoto(file, noticia, id);
+		noticiaService.createComFoto(file, noticia, email);
 	
 		return ResponseEntity.ok()
 				.body(new MessageResponse("Noticia cadastrada com sucesso!"));

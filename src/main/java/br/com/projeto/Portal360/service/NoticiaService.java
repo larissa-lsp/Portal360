@@ -81,9 +81,9 @@ public class NoticiaService {
 	}
 
 	@Transactional
-	public Noticia createComFoto(MultipartFile file, Noticia noticia, long id) {
+	public Noticia createComFoto(MultipartFile file, Noticia noticia, String email) {
 		
-		Usuario usuario = usuarioRepository.findById(id).orElseThrow();
+		Usuario usuario = usuarioRepository.findByEmail(email);
 		
 		if (file != null && file.getSize() > 0) {
 			try {
