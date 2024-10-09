@@ -33,10 +33,42 @@ public class NoticiaService {
 		return noticias;
 	}
 	
+	public List<Noticia> findAll_Publicadas() {
+		List<Noticia> noticias = noticiaRepository.findByStatusNoticia("PUBLICADA");
+
+		return noticias;
+	}
+	
+	public List<Noticia> findAll_EmAnalise() {
+		List<Noticia> noticias = noticiaRepository.findByStatusNoticia("EM ANÁLISE");
+
+		return noticias;
+	}
+	
+	public List<Noticia> findAll_Pubs_EmAnalise() {
+		List<Noticia> noticias = noticiaRepository.findByStatusNoticiaNot("INATIVO");
+
+		return noticias;
+	}
+	
 	public Noticia findById(long id) {
 		Noticia noticia = noticiaRepository.findById(id).orElseThrow();
 
 		return noticia;
+	}
+	
+	@Transactional
+	public Noticia publicar(long id) {
+		Optional<Noticia> _noticia = noticiaRepository.findById(id);
+	
+		if (_noticia.isPresent()) {
+			Noticia noticiaAtualizada = _noticia.get();
+			noticiaAtualizada.setDataPublicacao(LocalDateTime.now());
+			noticiaAtualizada.setStatusNoticia("PUBLICADA");
+
+			return noticiaRepository.save(noticiaAtualizada);
+		}
+		return null;
 	}
 
 	@Transactional
@@ -44,7 +76,7 @@ public class NoticiaService {
 
 		noticia.setDataEnvio(LocalDateTime.now());
 		noticia.setDataPublicacao(null);
-		noticia.setStatusNoticia("ATIVO");
+		noticia.setStatusNoticia("EM ANÁLISE");
 
 		return noticiaRepository.save(noticia);
 	}
@@ -64,19 +96,28 @@ public class NoticiaService {
 	}
 
 	@Transactional
-	public Noticia alterar(long id, Noticia noticia) {
+	public Noticia alterar(MultipartFile file,  long id, Noticia noticia) {
 
 		Optional<Noticia> _noticia = noticiaRepository.findById(id);
 
 		if (_noticia.isPresent()) {
 			Noticia noticiaAtualizada = _noticia.get();
-
+			
+			if (file != null && file.getSize() > 0) {
+				try {
+					noticiaAtualizada.setFoto(file.getBytes());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			noticiaAtualizada.setManchete(noticia.getManchete());
 			noticiaAtualizada.setConteudo(noticia.getConteudo());
 			noticiaAtualizada.setPalavrasChave(noticia.getPalavrasChave());
 			noticiaAtualizada.setFonte(noticia.getFonte());
-
+		
 			return noticiaRepository.save(noticiaAtualizada);
 		}
+		
 		return null;
 	}
 
@@ -97,7 +138,7 @@ public class NoticiaService {
 		noticia.setUsuario(usuario);
 		noticia.setDataEnvio(LocalDateTime.now());
 		noticia.setDataPublicacao(null);
-		noticia.setStatusNoticia("ATIVO");
+		noticia.setStatusNoticia("EM ANÁLISE");
 
 		return noticiaRepository.save(noticia);
 	}

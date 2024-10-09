@@ -29,7 +29,7 @@ public class Noticia {
 	@JoinColumn(name="usuario_id")
 	private Usuario usuario;
 
-	private String statusNoticia;
+	private String statusNoticia; //EM ANÁLISE ou PUBLICADA ou INATIVO
 
 
 	public long getId() {

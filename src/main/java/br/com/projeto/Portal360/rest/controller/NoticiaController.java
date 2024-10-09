@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,6 +32,30 @@ public class NoticiaController {
 	public ResponseEntity<List<Noticia>> findAll() {
 
 		List<Noticia> noticias = noticiaService.findAll();
+
+		return new ResponseEntity<List<Noticia>>(noticias, HttpStatus.OK);
+	}
+	
+	@GetMapping("findAll_Publicadas")
+	public ResponseEntity<List<Noticia>> findAll_Publicadas() {
+
+		List<Noticia> noticias = noticiaService.findAll_Publicadas();
+
+		return new ResponseEntity<List<Noticia>>(noticias, HttpStatus.OK);
+	}
+	
+	@GetMapping("findAll_EmAnalise")
+	public ResponseEntity<List<Noticia>> findAll_EmAnalise() {
+
+		List<Noticia> noticias = noticiaService.findAll_EmAnalise();
+
+		return new ResponseEntity<List<Noticia>>(noticias, HttpStatus.OK);
+	}
+	
+	@GetMapping("findAll_Pubs_EmAnalise")
+	public ResponseEntity<List<Noticia>> findAll_Pubs_EmAnalise() {
+
+		List<Noticia> noticias = noticiaService.findAll_Pubs_EmAnalise();
 
 		return new ResponseEntity<List<Noticia>>(noticias, HttpStatus.OK);
 	}
@@ -62,9 +85,15 @@ public class NoticiaController {
 		noticiaService.createComFoto(file, noticia, email);
 	
 		return ResponseEntity.ok()
-				.body(new MessageResponse("Noticia cadastrada com sucesso!"));
+				.body(new MessageResponse("Notícia cadastrada com sucesso!"));
 	}
 		
+	@PutMapping("publicar/{id}")
+	public ResponseEntity<Noticia> publicar(@PathVariable long id) {
+		Noticia noticia = noticiaService.publicar(id);
+
+		return new ResponseEntity<Noticia>(noticia, HttpStatus.OK);
+	}
 
 	@PutMapping("inativar/{id}")
 	public ResponseEntity<Noticia> inativar(@PathVariable long id) {
@@ -74,11 +103,14 @@ public class NoticiaController {
 	}
 
 	@PutMapping("alterar/{id}")
-	public ResponseEntity<Noticia> alterar(@PathVariable long id, @RequestBody Noticia noticia) {
+	public ResponseEntity<?> alterar(
+			@RequestParam(value = "file", required = false) MultipartFile file,
+			@PathVariable long id, @ModelAttribute Noticia noticia) {
+		
+		noticiaService.alterar(file, id, noticia);
 
-		Noticia _noticia = noticiaService.alterar(id, noticia);
-
-		return new ResponseEntity<Noticia>(_noticia, HttpStatus.OK);
+		return ResponseEntity.ok()
+				.body(new MessageResponse("Notícia alterada com sucesso!"));
 	}
 
 }
