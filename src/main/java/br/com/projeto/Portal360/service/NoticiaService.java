@@ -88,7 +88,7 @@ public class NoticiaService {
 
 		if (_noticia.isPresent()) {
 			Noticia noticiaAtualizada = _noticia.get();
-			noticiaAtualizada.setStatusNoticia(null);
+			noticiaAtualizada.setStatusNoticia("INATIVO");
 
 			return noticiaRepository.save(noticiaAtualizada);
 		}
