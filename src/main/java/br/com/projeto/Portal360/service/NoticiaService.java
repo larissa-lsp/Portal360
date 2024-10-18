@@ -114,6 +114,7 @@ public class NoticiaService {
 			noticiaAtualizada.setConteudo(noticia.getConteudo());
 			noticiaAtualizada.setPalavrasChave(noticia.getPalavrasChave());
 			noticiaAtualizada.setFonte(noticia.getFonte());
+			noticiaAtualizada.setStatusNoticia("EM ANÁLISE");
 		
 			return noticiaRepository.save(noticiaAtualizada);
 		}
